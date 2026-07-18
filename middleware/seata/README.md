@@ -1,5 +1,29 @@
 # Seata
 
-Planned responsibilities: registry and configuration integration, server deployment, persistence,
-resource-manager connectivity, health checks, and rollback verification. Seata is restricted to
-short transactions and selected TCC/Saga cases; long asynchronous workflows use Outbox/Inbox.
+本目录负责 Seata Server 的部署、注册配置、持久化、健康检查和回滚验证。
+
+## 使用边界
+
+- AT：仅用于短事务和明确的数据库资源。
+- TCC：用于关键资源冻结与确认/取消。
+- Saga：仅用于显式同步补偿场景。
+- 长时间生产流程默认使用 Outbox/Inbox、幂等、重试、补偿和对账。
+
+禁止把持续数小时或数天的生产生命周期包装成单个 Seata 全局事务。
+
+## V1 目标
+
+- 验证与 Spring Boot 4、Spring Cloud Alibaba 的兼容性。
+- 完成 Nacos 注册与配置集成。
+- 配置 Seata Server 持久化和健康检查。
+- 验证 Resource Manager 连接。
+- 执行短事务提交、回滚、超时和服务中断测试。
+
+## 进入部署前必须明确
+
+- 精确版本和镜像 Digest。
+- 数据库 Schema、账号和权限。
+- 注册中心和配置中心依赖。
+- 事务分组与服务映射。
+- 高可用目标和资源基线。
+- 升级、回滚和异常事务处理 Runbook。
