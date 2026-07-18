@@ -1,4 +1,22 @@
-# Backup
+# 备份
 
-Backup automation must define scope, frequency, retention, encryption, storage target, verification,
-and restore testing. A backup is not considered valid until a documented restore test succeeds.
+本目录保存备份任务、备份配置模板、校验脚本和恢复测试入口。
+
+> 当前状态：目录边界已建立，具体备份作业尚未完成。
+
+## 必须定义
+
+- 备份对象与排除范围。
+- 全量、增量或日志备份方式。
+- 执行频率和保留周期。
+- 加密方式和存储目标。
+- 失败告警。
+- 完整性校验。
+- 恢复 Runbook。
+- 定期恢复测试。
+
+## 核心原则
+
+没有通过恢复验证的备份不视为有效备份。
+
+详细规则见：[备份恢复与容灾](../docs/disaster-recovery/备份恢复与容灾.md)。
