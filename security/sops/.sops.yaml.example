@@ -1,0 +1,9 @@
+creation_rules:
+  - path_regex: environments/local/secrets/.*\.sops\.ya?ml$
+    age: AGE_PUBLIC_RECIPIENT_FOR_LOCAL
+  - path_regex: environments/dev/secrets/.*\.sops\.ya?ml$
+    age: AGE_PUBLIC_RECIPIENT_FOR_DEV
+  - path_regex: environments/test/secrets/.*\.sops\.ya?ml$
+    age: AGE_PUBLIC_RECIPIENT_FOR_TEST
+  - path_regex: environments/prod-like/secrets/.*\.sops\.ya?ml$
+    age: AGE_PUBLIC_RECIPIENT_FOR_PROD_LIKE
