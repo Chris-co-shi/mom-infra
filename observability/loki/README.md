@@ -1,4 +1,25 @@
 # Loki
 
-Loki will receive structured application and infrastructure logs. Labels must remain low-cardinality;
-trace IDs, user IDs, batch numbers, and order numbers belong in log fields rather than index labels.
+本目录负责应用和基础设施结构化日志的存储、保留和查询配置。
+
+## 设计原则
+
+- Label 保持低基数。
+- `trace_id`、用户 ID、批次号、工单号等放在日志字段中，不作为无限增长的索引 Label。
+- 日志不得包含密码、Token、私钥和敏感业务数据。
+- Loki 故障不得阻塞核心业务。
+- 需要明确日志保留、压缩、容量和磁盘压力策略。
+
+## V1 目标
+
+- 接收 MOM、PCS、WCS、Kubernetes 和中间件日志。
+- 统一环境、服务、Namespace 和日志级别字段。
+- 支持通过 Trace ID 查询关联日志。
+- 建立错误率、日志丢弃和存储压力监控。
+
+## 验收
+
+- Grafana 可按服务、环境和时间查询日志。
+- 错误日志能跳转到对应 Trace。
+- 高基数字段不会进入 Label。
+- 日志后端中断时应用不会无限缓冲或耗尽磁盘。

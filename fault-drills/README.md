@@ -1,7 +1,19 @@
-# Fault drills
+# 故障演练
 
-Planned controlled scenarios include node loss, pod eviction, Redis failover, PostgreSQL recovery,
-Nacos unavailability, RocketMQ duplicate delivery, Seata interruption, telemetry pipeline failure,
-network latency, storage pressure, rolling upgrade, and rollback.
+本目录保存受控故障场景、注入脚本、恢复步骤和演练证据。
 
-Every drill must define blast radius, stop conditions, expected signals, recovery steps, and evidence.
+## 计划场景
+
+- Pod 删除与节点失联。
+- Redis 中断、内存压力和恢复。
+- PostgreSQL 故障与恢复。
+- Nacos 不可用和配置回滚。
+- RocketMQ 重复投递、积压和 Broker 中断。
+- Seata 服务中断。
+- OpenTelemetry 管道故障。
+- 网络延迟、存储压力、滚动升级和回滚。
+- PCS/WCS 超时、重复回执和人工接管。
+
+每次演练必须定义爆炸半径、预期信号、停止条件、恢复步骤、技术与业务验证和证据。
+
+详细规则见：[故障演练计划](../docs/fault-drills/故障演练计划.md)。

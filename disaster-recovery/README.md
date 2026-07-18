@@ -1,4 +1,18 @@
-# Disaster recovery
+# 灾难恢复
 
-This area will define RPO/RTO targets, dependency recovery order, cluster rebuild procedures, data
-restore, service validation, evidence collection, and post-recovery reconciliation.
+本目录保存 RPO/RTO、依赖恢复顺序、集群重建、数据恢复、业务验证和恢复证据。
+
+> 当前状态：恢复原则与文档结构已建立，组件级恢复脚本和实测证据仍待补充。
+
+## 内容要求
+
+- 故障场景和影响范围。
+- 恢复目标与优先级。
+- 所需备份、密钥和工具。
+- 集群、存储、中间件和应用恢复顺序。
+- 技术验证与业务验证。
+- 实际 RPO/RTO。
+- 恢复后的数据对账。
+- 未解决风险与复盘。
+
+详细规则见：[备份恢复与容灾](../docs/disaster-recovery/备份恢复与容灾.md)。
