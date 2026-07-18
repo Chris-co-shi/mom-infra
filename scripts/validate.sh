@@ -1,46 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-required_paths=(
-  config/component-versions.yaml
-  kubernetes/base/kustomization.yaml
-  environments/local/kustomization.yaml
-  environments/dev/kustomization.yaml
-  environments/test/kustomization.yaml
-  environments/prod-like/kustomization.yaml
-  observability/otel-collector/collector.yaml
-)
+root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${root_dir}"
 
-for path in "${required_paths[@]}"; do
-  if [[ ! -f "$path" ]]; then
-    echo "missing required file: $path" >&2
+required_commands=(python3 yamllint shellcheck kustomize kubeconform gitleaks)
+for command_name in "${required_commands[@]}"; do
+  if ! command -v "${command_name}" >/dev/null 2>&1; then
+    echo "required validation tool is missing: ${command_name}" >&2
     exit 1
   fi
 done
 
-if command -v yamllint >/dev/null 2>&1; then
-  mapfile -t yaml_files < <(find . -type f \( -name '*.yaml' -o -name '*.yml' \) -not -path './.git/*' | sort)
-  yamllint -c .yamllint.yml "${yaml_files[@]}"
-else
-  echo "yamllint not installed; skipping YAML lint" >&2
-fi
+python3 scripts/validate.py --mode source
 
-if command -v shellcheck >/dev/null 2>&1; then
-  shellcheck scripts/*.sh
-else
-  echo "shellcheck not installed; skipping shell lint" >&2
-fi
+mapfile -t yaml_files < <(
+  find . -type f \( -name '*.yaml' -o -name '*.yml' \) \
+    -not -path './.git/*' \
+    -not -path './.tmp/*' \
+    -not -path './rendered/*' \
+    | sort
+)
+yamllint -c .yamllint.yml "${yaml_files[@]}"
+shellcheck scripts/*.sh
 
-if grep -RInE 'image:[[:space:]]+[^[:space:]]+:latest([[:space:]]|$)' . \
-  --include='*.yaml' --include='*.yml' --exclude-dir=.git; then
-  echo "floating latest image tag is forbidden" >&2
-  exit 1
-fi
+./scripts/render.sh
+python3 scripts/validate.py --mode rendered --rendered-dir .tmp/rendered
 
-if find . -type f \( -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.jks' \) \
-  -not -path './.git/*' | grep -q .; then
-  echo "private key or keystore material must not be committed" >&2
-  exit 1
-fi
+for environment in local dev test prod-like; do
+  kubeconform -strict -summary ".tmp/rendered/${environment}.yaml"
+done
 
-echo "infrastructure skeleton validation passed"
+gitleaks dir "${root_dir}" --redact --no-banner
+
+echo "infrastructure validation passed"
