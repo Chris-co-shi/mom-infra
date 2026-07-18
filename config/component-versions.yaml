@@ -1,0 +1,43 @@
+apiVersion: infra.mom.io/v1alpha1
+kind: ComponentCatalog
+metadata:
+  name: mom-infra
+spec:
+  status: pending-validation
+  policy:
+    forbidLatestTag: true
+    requireImageDigestForProdLike: true
+  components:
+    - name: k3s
+      version: pending
+      source: https://github.com/k3s-io/k3s
+    - name: postgresql
+      version: pending
+      source: https://www.postgresql.org/
+    - name: redis
+      version: pending
+      source: https://redis.io/
+    - name: nacos
+      version: pending
+      source: https://nacos.io/
+    - name: rocketmq
+      version: pending
+      source: https://rocketmq.apache.org/
+    - name: seata
+      version: pending
+      source: https://seata.apache.org/
+    - name: opentelemetry-collector
+      version: pending
+      source: https://opentelemetry.io/docs/collector/
+    - name: prometheus
+      version: pending
+      source: https://prometheus.io/
+    - name: grafana
+      version: pending
+      source: https://grafana.com/
+    - name: tempo
+      version: pending
+      source: https://grafana.com/oss/tempo/
+    - name: loki
+      version: pending
+      source: https://grafana.com/oss/loki/
