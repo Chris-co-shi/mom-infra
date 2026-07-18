@@ -4,7 +4,7 @@ validate:
 	./scripts/validate.sh
 
 render:
-	./scripts/render.sh
+	bash ./scripts/render.sh
 
 validate-source:
 	python3 scripts/validate.py --mode source
