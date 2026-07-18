@@ -1,5 +1,27 @@
-# Networking
+# 网络与入口
 
-This area will own ingress, DNS, TLS, service exposure, network policies, source IP handling, and
-connectivity verification. Changes that may cut off cluster administration require a rollback path
-and an alternate management channel.
+本目录管理 Ingress、DNS、TLS、服务暴露、来源 IP、NetworkPolicy 和连通性验证。
+
+## 核心职责
+
+- 统一外部入口和域名规划。
+- TLS 证书引用、有效期与轮换。
+- 管理端口和业务端口暴露边界。
+- Namespace 与服务之间的网络访问规则。
+- 客户端真实 IP 传递。
+- 集群内外连通性测试。
+
+## 安全约束
+
+- PostgreSQL、Redis、Nacos、RocketMQ、Seata 管理端口不默认暴露公网。
+- 可能导致管理通道失联的修改必须先准备替代管理通道和回滚步骤。
+- 临时端口转发、白名单和放行策略必须在操作后清理。
+- 网络策略变更需要验证 Gateway、应用、中间件和可观测性链路。
+
+## 验收
+
+- Ingress HTTPS 可用。
+- 证书状态可监控。
+- 非授权 Namespace 无法访问受限服务。
+- 应用仍可访问其明确依赖。
+- 网络变更有回滚和连通性验证证据。
