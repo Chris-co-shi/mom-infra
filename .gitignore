@@ -1,0 +1,34 @@
+# Operating systems and IDEs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+secrets/
+**/secret-values*.yaml
+**/rendered-secrets/
+
+# Generated and local runtime files
+.tmp/
+tmp/
+build/
+dist/
+coverage/
+*.log
+
+# Terraform or future IaC state
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Helm and Kubernetes generated output
+charts/*.tgz
+rendered/
