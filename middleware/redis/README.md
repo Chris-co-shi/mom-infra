@@ -1,5 +1,29 @@
 # Redis
 
-Planned responsibilities: caching, token state, distributed rate-limit state, idempotency support,
-high availability, persistence policy, memory limits, eviction policy, backup, and failover drills.
-Application correctness must not rely on Redis as the authoritative business data store.
+本目录负责 Redis 的部署、持久化、容量、高可用和故障演练配置。
+
+## V1 用途
+
+- 缓存。
+- Token、黑名单等安全状态。
+- Gateway 分布式限流状态。
+- 幂等和短期协调辅助。
+- 部分可重建临时状态。
+
+## 架构约束
+
+- Redis 不是权威业务数据库。
+- 库存、批次、质量和工单事实不得只存在 Redis。
+- 限流、缓存和幂等状态需要明确 Redis 故障时的降级策略。
+- 必须配置内存上限、驱逐策略和持久化策略。
+- 应用不得因为遥测或缓存写入失败而无限阻塞。
+
+## 进入部署前必须明确
+
+- 精确版本和镜像 Digest。
+- 单实例、哨兵或其他拓扑选择。
+- RDB/AOF 策略。
+- 内存与驱逐策略。
+- PVC 和容量。
+- 认证与网络访问。
+- 备份、恢复、故障切换和缓存预热 Runbook。
