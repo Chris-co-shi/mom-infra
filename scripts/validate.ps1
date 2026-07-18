@@ -1,30 +1,49 @@
 $ErrorActionPreference = 'Stop'
+$rootDirectory = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+Set-Location $rootDirectory
 
-$requiredPaths = @(
-    'config/component-versions.yaml',
-    'kubernetes/base/kustomization.yaml',
-    'environments/local/kustomization.yaml',
-    'environments/dev/kustomization.yaml',
-    'environments/test/kustomization.yaml',
-    'environments/prod-like/kustomization.yaml',
-    'observability/otel-collector/collector.yaml'
-)
-
-foreach ($path in $requiredPaths) {
-    if (-not (Test-Path $path -PathType Leaf)) {
-        throw "Missing required file: $path"
+foreach ($commandName in @('python', 'yamllint', 'kustomize', 'kubeconform', 'gitleaks')) {
+    if (-not (Get-Command $commandName -ErrorAction SilentlyContinue)) {
+        throw "Required validation tool is missing: $commandName"
     }
 }
 
-$latestTags = Get-ChildItem -Recurse -File -Include *.yaml,*.yml |
-    Select-String -Pattern 'image:\s+\S+:latest(?:\s|$)'
-if ($latestTags) {
-    throw 'Floating latest image tag is forbidden.'
+& python scripts/validate.py --mode source
+if ($LASTEXITCODE -ne 0) {
+    throw 'Source policy validation failed.'
 }
 
-$privateMaterial = Get-ChildItem -Recurse -File -Include *.pem,*.key,*.p12,*.jks
-if ($privateMaterial) {
-    throw 'Private key or keystore material must not be committed.'
+$yamlFiles = Get-ChildItem $rootDirectory -Recurse -File -Include *.yaml,*.yml |
+    Where-Object {
+        $_.FullName -notmatch '[\\/]\.git[\\/]' -and
+        $_.FullName -notmatch '[\\/]\.tmp[\\/]' -and
+        $_.FullName -notmatch '[\\/]rendered[\\/]'
+    } |
+    ForEach-Object { $_.FullName }
+
+& yamllint -c (Join-Path $rootDirectory '.yamllint.yml') @yamlFiles
+if ($LASTEXITCODE -ne 0) {
+    throw 'YAML lint failed.'
 }
 
-Write-Host 'Infrastructure skeleton validation passed.'
+& (Join-Path $PSScriptRoot 'render.ps1')
+
+& python scripts/validate.py --mode rendered --rendered-dir .tmp/rendered
+if ($LASTEXITCODE -ne 0) {
+    throw 'Rendered policy validation failed.'
+}
+
+foreach ($environment in @('local', 'dev', 'test', 'prod-like')) {
+    $manifest = Join-Path $rootDirectory ".tmp/rendered/$environment.yaml"
+    & kubeconform -strict -summary $manifest
+    if ($LASTEXITCODE -ne 0) {
+        throw "Kubernetes schema validation failed for $environment."
+    }
+}
+
+& gitleaks dir $rootDirectory --redact --no-banner
+if ($LASTEXITCODE -ne 0) {
+    throw 'Gitleaks detected a secret or failed to scan the repository.'
+}
+
+Write-Host 'Infrastructure validation passed.'

@@ -3,41 +3,107 @@ kind: ComponentCatalog
 metadata:
   name: mom-infra
 spec:
-  status: pending-validation
+  status: phase-01a-foundation
+  platformCompatibility:
+    java: "25"
+    springBoot: "4.1.x"
+    springCloud: "2025.1.x"
+    springCloudAlibaba: "2025.1.x"
   policy:
-    forbidLatestTag: true
+    forbidFloatingTags: true
+    requireExplicitImageTag: true
     requireImageDigestForProdLike: true
+    requireValidatedSource: true
+  tooling:
+    - name: kustomize
+      version: 5.8.1
+      validationStatus: pinned
+      source: https://github.com/kubernetes-sigs/kustomize
+      purpose: render-environment-overlays
+    - name: kubeconform
+      version: 0.7.0
+      validationStatus: pinned
+      source: https://github.com/yannh/kubeconform
+      purpose: validate-kubernetes-schemas
+    - name: gitleaks
+      version: 8.30.1
+      validationStatus: pinned
+      source: https://github.com/gitleaks/gitleaks
+      purpose: scan-secrets
+    - name: sops
+      version: 3.13.0
+      validationStatus: selected
+      source: https://github.com/getsops/sops
+      purpose: encrypt-secret-manifests
+    - name: age
+      version: 1.3.1
+      validationStatus: selected
+      source: https://github.com/FiloSottile/age
+      purpose: sops-recipient-provider
   components:
     - name: k3s
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: installer
       source: https://github.com/k3s-io/k3s
+      nextValidation: record-current-three-node-cluster-version
     - name: postgresql
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: decision-required
       source: https://www.postgresql.org/
+      nextValidation: phase-01b-deployment-and-restore-poc
     - name: redis
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: decision-required
       source: https://redis.io/
+      nextValidation: phase-01c-persistence-and-client-poc
     - name: nacos
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: decision-required
       source: https://nacos.io/
+      nextValidation: phase-01c-spring-cloud-alibaba-compatibility-poc
     - name: rocketmq
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: decision-required
       source: https://rocketmq.apache.org/
+      nextValidation: phase-01d-producer-consumer-poc
     - name: seata
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: decision-required
       source: https://seata.apache.org/
+      nextValidation: phase-01d-java25-spring-boot4-compatibility-poc
     - name: opentelemetry-collector
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: helm-or-manifest-decision-required
       source: https://opentelemetry.io/docs/collector/
+      nextValidation: phase-01e-otlp-ingress-poc
     - name: prometheus
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: helm-decision-required
       source: https://prometheus.io/
+      nextValidation: phase-01e-metrics-poc
     - name: grafana
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: helm-decision-required
       source: https://grafana.com/
+      nextValidation: phase-01e-investigation-poc
     - name: tempo
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: helm-decision-required
       source: https://grafana.com/oss/tempo/
+      nextValidation: phase-01e-traces-poc
     - name: loki
-      version: pending
+      version: null
+      validationStatus: candidate-selection-required
+      deploymentMode: helm-decision-required
       source: https://grafana.com/oss/loki/
+      nextValidation: phase-01e-logs-poc

@@ -13,20 +13,20 @@
   <img alt="Kubernetes" src="https://img.shields.io/badge/Kubernetes-k3s-326CE5?logo=kubernetes&logoColor=white">
   <img alt="IaC" src="https://img.shields.io/badge/Infrastructure-as%20Code-4B5563">
   <img alt="Observability" src="https://img.shields.io/badge/Observability-OpenTelemetry-F5A800?logo=opentelemetry&logoColor=white">
-  <img alt="Status" src="https://img.shields.io/badge/Status-V1%20Foundation-2563EB">
+  <img alt="Status" src="https://img.shields.io/badge/Status-Phase%2001A-2563EB">
 </p>
 
-[文档中心](docs/README.md) · [总体架构](docs/architecture/基础设施总体架构.md) · [环境模型](docs/environments/环境模型与晋级规则.md) · [Phase 01 计划](docs/plans/Phase-01-基础设施计划.md) · [运行手册](docs/runbooks/运行手册规范.md)
+[文档中心](docs/README.md) · [总体架构](docs/architecture/基础设施总体架构.md) · [环境模型](docs/environments/环境模型与晋级规则.md) · [Phase 01A](docs/plans/Phase-01A-可执行基础与门禁.md) · [运行手册](docs/runbooks/运行手册规范.md)
 
 </div>
 
 ---
 
 > [!IMPORTANT]
-> 当前仓库处于 **V1 基础设施骨架阶段**。已建立目录边界、环境 Overlay、命名空间、版本目录和校验脚本，但尚未提供可直接用于生产的完整中间件部署。
+> 当前仓库处于 **Infra Phase 01A 可执行基础与校验门禁阶段**。已开始落地环境拓扑、Kustomize 渲染、Schema 校验、Secret 策略和跨平台 CI，但尚未提供可直接用于生产的完整中间件部署。
 
 > [!NOTE]
-> 所有文档新增、修改、重命名和整理统一在 `agent/complete-chinese-docs` 分支进行，再通过 PR 合并到 `main`。
+> 文档必须与其描述的 Manifest、脚本和配置在同一 Feature 分支与 PR 中演进，避免文档与实现偏离。
 
 ## 🌟 仓库使命
 
@@ -149,9 +149,9 @@ mom-infra/
 | 日志 | Loki |
 | 追踪 | Tempo |
 | 可视化 | Grafana |
-| 自动校验 | GitHub Actions、YAML Lint、ShellCheck、自定义脚本 |
+| 自动校验 | GitHub Actions、YAML Lint、ShellCheck、Kubeconform、Gitleaks、自定义策略 |
 
-所有组件版本、镜像和来源最终由 [`config/component-versions.yaml`](config/component-versions.yaml) 锁定；`prod-like` 禁止使用浮动 Tag。
+所有组件版本、镜像和来源最终由 [`config/component-versions.yaml`](config/component-versions.yaml) 锁定；`prod-like` 禁止使用浮动 Tag，并要求镜像 Digest。
 
 ## 🌍 环境晋级
 
@@ -164,9 +164,9 @@ local → dev → test → prod-like
 | `local` | 开发者验证 | 可丢弃 | 单节点可接受 |
 | `dev` | 多服务共享集成 | 可重建 | 允许短时中断 |
 | `test` | 端到端与故障测试 | 需要备份 | 模拟关键拓扑 |
-| `prod-like` | 面试演示与生产模拟 | 受保护 | 三节点 k3s 目标 |
+| `prod-like` | 面试演示与生产模拟 | 受保护 | 独立三节点 k3s 目标 |
 
-环境差异只能通过 Overlay 和外部 Secret 表达；禁止直接修改运行集群后不回写 Git。
+四套环境使用固定 Namespace 名称，由独立集群或 kube-context 区分；环境差异只能通过 Overlay 和加密 Secret 表达。禁止直接修改运行集群后不回写 Git。
 
 ## 🚀 快速验证
 
@@ -186,15 +186,20 @@ local → dev → test → prod-like
 
 ```bash
 make validate
+make render
 ```
 
-当前校验重点包括：
+当前校验包括：
 
-- YAML 基础语法和风格。
-- Shell 脚本静态检查。
-- 目录与基础资源存在性。
-- 禁止提交常见凭证和私钥文件。
-- 后续逐步加入 Kustomize 渲染、Schema、镜像 Tag 和策略校验。
+- YAML 与 Shell 脚本静态检查。
+- 四套 Kustomize Overlay 渲染。
+- 固定 Namespace 与环境标签契约。
+- Kubernetes Schema 校验。
+- 禁止无 Tag、浮动 Tag 和 `prod-like` 非 Digest 镜像。
+- 禁止未加密 Kubernetes Secret、私钥和 age identity。
+- 检查 `privileged`、`hostNetwork`、`hostPID`、`hostIPC`、`hostPath` 和过度 RBAC。
+- Gitleaks 凭证扫描。
+- Linux 与 Windows 双平台 GitHub Actions。
 
 ## 📚 文档导航
 
@@ -204,9 +209,11 @@ make validate
 | 架构 | [基础设施总体架构](docs/architecture/基础设施总体架构.md) | 集群、命名空间和组件关系 |
 | 架构 | [仓库边界](docs/architecture/仓库边界.md) | 本仓库与应用仓库的职责划分 |
 | 环境 | [环境模型与晋级规则](docs/environments/环境模型与晋级规则.md) | Overlay、晋级和漂移治理 |
-| 计划 | [Phase 01 基础设施计划](docs/plans/Phase-01-基础设施计划.md) | 当前阶段的实施顺序和验收 |
+| 计划 | [Phase 01 基础设施计划](docs/plans/Phase-01-基础设施计划.md) | 总体实施顺序和验收 |
+| 计划 | [Phase 01A 可执行基础](docs/plans/Phase-01A-可执行基础与门禁.md) | 当前工作切片和完成定义 |
 | 运维 | [运行手册规范](docs/runbooks/运行手册规范.md) | Runbook 的标准结构 |
 | 安全 | [安全与密钥管理](docs/security/安全与密钥管理.md) | Secret、RBAC 和供应链边界 |
+| 安全 | [SOPS + age 工作流](security/sops/README.md) | 密钥生成、加密、轮换与恢复 |
 | 可观测性 | [可观测性基础设施](docs/observability/可观测性基础设施.md) | Metrics、Logs、Traces 闭环 |
 | 容灾 | [备份恢复与容灾](docs/disaster-recovery/备份恢复与容灾.md) | RPO/RTO、恢复顺序和证据 |
 | 演练 | [故障演练计划](docs/fault-drills/故障演练计划.md) | 受控故障场景和停止条件 |
@@ -216,25 +223,28 @@ make validate
 
 | 阶段 | 目标 | 状态 |
 |---|---|---|
-| Infra Phase 01 | 版本矩阵、Namespace、校验、基础可观测性 | 🚧 进行中 |
-| Infra Phase 02 | PostgreSQL、Redis、Nacos、RocketMQ、Seata 部署 | ⏳ 计划中 |
-| Infra Phase 03 | MOM/PCS/WCS 应用部署与环境晋级 | ⏳ 计划中 |
-| Infra Phase 04 | 备份恢复、滚动升级、回滚和故障演练 | ⏳ 计划中 |
+| Infra Phase 01A | 环境拓扑、Secret、Kustomize、Schema 和 CI 门禁 | 🚧 进行中 |
+| Infra Phase 01B | PostgreSQL local/dev 部署与恢复 PoC | ⏳ 计划中 |
+| Infra Phase 01C | Redis、Nacos PoC | ⏳ 计划中 |
+| Infra Phase 01D | RocketMQ、Seata PoC | ⏳ 计划中 |
+| Infra Phase 01E | OTel、Prometheus、Loki、Tempo、Grafana 闭环 | ⏳ 计划中 |
+| Infra Phase 02 | MOM/PCS/WCS 应用部署与环境晋级 | ⏳ 计划中 |
+| Infra Phase 03 | 备份恢复、滚动升级、回滚和故障演练 | ⏳ 计划中 |
 
 ### 当前优先事项
 
-- [ ] 冻结组件版本、镜像来源和许可证信息。
-- [ ] 完成 Kustomize Base 与四套 Overlay 的渲染验证。
-- [ ] 确定 StorageClass、持久卷和容量基线。
-- [ ] 落地 Secret 管理方案，禁止明文凭证。
-- [ ] 接通 OTel Collector、Prometheus、Loki、Tempo、Grafana。
-- [ ] 建立 PostgreSQL 和 Redis 的恢复验证流程。
-- [ ] 为关键中间件补充部署、升级、回滚和故障 Runbook。
+- [x] 明确环境与集群拓扑。
+- [x] 选择 SOPS + age Secret 方案。
+- [x] 建立四套 Overlay 渲染和策略校验。
+- [x] 建立 Linux/Windows 双平台 CI 定义。
+- [ ] 生成各环境 age recipient 并完成轮换验证。
+- [ ] 记录现有三节点 k3s、StorageClass 和容量基线。
+- [ ] 启动 PostgreSQL local/dev 部署与恢复 PoC。
 
 ## 🧠 基础设施原则
 
 1. **Git 是权威源**：手工集群变更必须回写或回滚。
-2. **环境差异显式化**：差异只存在于 Overlay 和外部 Secret。
+2. **环境差异显式化**：差异只存在于 Overlay 和加密 Secret。
 3. **版本必须锁定**：类生产环境使用固定版本和镜像 Digest。
 4. **密钥不得入库**：Git 中只保存引用、模板和加密后材料。
 5. **备份必须可恢复**：未通过恢复测试的备份不算有效。

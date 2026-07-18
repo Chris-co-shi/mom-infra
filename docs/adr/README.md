@@ -19,6 +19,9 @@ ADR 用于记录影响长期架构、运维、安全和恢复能力的关键决�
 | [ADR-004](ADR-004-OpenTelemetry与Grafana可观测性栈.md) | OpenTelemetry 与 Grafana 可观测性栈 | Accepted | [可观测性基础设施](../observability/可观测性基础设施.md) |
 | [ADR-005](ADR-005-组件版本与镜像锁定.md) | 组件版本与镜像锁定 | Accepted | [Phase 01 计划](../plans/Phase-01-基础设施计划.md) |
 | [ADR-006](ADR-006-备份必须通过恢复验证.md) | 备份必须通过恢复验证 | Accepted | [备份恢复与容灾](../disaster-recovery/备份恢复与容灾.md) |
+| [ADR-007](ADR-007-环境与集群拓扑.md) | 环境与集群拓扑 | Accepted | [环境模型](../environments/环境模型与晋级规则.md) |
+| [ADR-008](ADR-008-第三方组件部署方式.md) | 第三方组件部署方式 | Accepted | [Phase 01 计划](../plans/Phase-01-基础设施计划.md) |
+| [ADR-009](ADR-009-使用SOPS与age管理密钥.md) | 使用 SOPS 与 age 管理密钥 | Accepted | [安全与密钥管理](../security/安全与密钥管理.md) |
 
 ## 维护规则
 
