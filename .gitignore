@@ -12,9 +12,15 @@ Thumbs.db
 *.key
 *.p12
 *.jks
+*.age
+*age-identity*.txt
+*SOPS_AGE_KEY_FILE*
 secrets/
 **/secret-values*.yaml
 **/rendered-secrets/
+**/*.decrypted.yaml
+**/*.plain.yaml
+security/sops/.sops.yaml
 
 # Generated and local runtime files
 .tmp/
