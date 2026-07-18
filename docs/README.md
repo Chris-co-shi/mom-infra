@@ -2,7 +2,7 @@
 
 本目录是 `mom-infra` 的架构、环境、计划、运行手册、容灾和架构决策权威入口。
 
-> 所有文档新增、修改、重命名和整理统一在 `agent/complete-chinese-docs` 分支进行，详见 [文档维护约定](文档维护约定.md)。
+> 文档必须与其描述的 Manifest、脚本和配置在同一 Feature 分支与 PR 中演进，详见 [文档维护约定](文档维护约定.md)。
 
 ## 文档职责
 
@@ -25,6 +25,7 @@
 
 - [环境模型与晋级规则](environments/环境模型与晋级规则.md)
 - [Phase 01 基础设施计划](plans/Phase-01-基础设施计划.md)
+- [Phase 01A：可执行基础与校验门禁](plans/Phase-01A-可执行基础与门禁.md)
 
 ## 运维与治理
 
@@ -45,6 +46,7 @@
 - [Kubernetes Base](../kubernetes/base/)
 - [环境 Overlays](../environments/)
 - [校验脚本](../scripts/)
+- [SOPS + age 工作流](../security/sops/README.md)
 
 ## 文档维护原则
 
@@ -58,4 +60,4 @@
 
 ## 当前阶段
 
-当前处于 Infra Phase 01：完成版本矩阵、环境模型、校验门禁、命名空间和可观测性最小闭环。在这些能力通过验收前，不直接进入类生产中间件集群部署。
+当前处于 Infra Phase 01A：完成环境拓扑、Secret 选型、Kustomize 渲染、Schema 校验、策略门禁和 Linux/Windows 双平台 CI。Phase 01A 通过后进入 PostgreSQL local/dev 纵向 PoC。
