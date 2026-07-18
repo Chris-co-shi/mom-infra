@@ -24,7 +24,7 @@ mapfile -t yaml_files < <(
 yamllint -c .yamllint.yml "${yaml_files[@]}"
 shellcheck scripts/*.sh
 
-./scripts/render.sh
+bash scripts/render.sh
 python3 scripts/validate.py --mode rendered --rendered-dir .tmp/rendered
 
 for environment in local dev test prod-like; do
